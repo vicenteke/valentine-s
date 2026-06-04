@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz dos Namorados</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Reset & Variables */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        :root {
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-mono: 'Roboto Mono', monospace;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            background-image: url('background.png');
+            background-repeat: repeat;
+            overflow-x: hidden;
+        }
+
+        /* Layout Container */
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            min-height: 90vh;
+        }
+
+        h1 {
+            font-size: 24pt;
+            font-weight: inherit;
+            margin-bottom: 1.5rem;
+        }
+
+        .block {
+            display: inline-block;
+            background: #FFF3D7;
+            padding: 20pt;
+            text-align: center;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.07);
+        }
+
+        .question {
+            text-align: center;
+            font-size: 20pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+            white-space: pre-line;
+        }
+
+        .box {
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            flex-direction: column;
+            flex-grow: 1;
+            width: 100%; 
+        }
+
+        .box .block {
+            min-width: 350px;
+            max-width: 95vw;
+        }
+
+        .hstack {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        .hstack {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hstack-fill {
+            width: 100%;
+        }
+
+        .hstack-fill button {
+            flex-grow: 1;
+            flex-basis: 0;
+        }
+
+        button {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-size: 12pt;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            color: white;
+            text-align: center;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: none;
+        }
+
+        button.primary {
+            background: #F52727;
+        }
+
+        button.secondary {
+            background: #696969;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 11pt;
+            border: 2px solid #e2d9c5;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        label {
+            font-family: var(--font-mono);
+            font-size: 11pt;
+            margin-bottom: 5px;
+        }
+
+        .input-field:focus {
+            border-color: #696969;
+        }
+
+        .quiz-stage {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 1;
+            transform: translateX(0);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .exit-left {
+            opacity: 0;
+            transform: translateX(-100vw);
+        }
+        .enter-right {
+            opacity: 0;
+            transform: translateX(100vw);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+
+        .image-option {
+            aspect-ratio: 1;
+            max-width: 40%;
+            cursor: pointer;
+        }
+
+        .final-text {
+            font-family: var(--font-serif);
+            font-size: 12pt;
+            text-align: left;
+            margin-bottom: 10pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="block" id="h1">Quiz dos Namorados</h1>
+        
+        <div class="box">
+            <div id="stage-error" class="quiz-stage enter-right hidden">
+                <div class="block">
+                    <p class="question">Não me ama mais?</p>
+                    <img src="./error.png" style="max-width: 300px;margin: auto;margin-bottom: 20px;"/>
+                    <div class="hstack hstack-fill">
+                        <button class="primary" onclick="hideError()">AMO SIM, NÃO VAI SE REPETIR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stage-1" class="quiz-stage">
+                <div class="block">
+                    <p class="question">Quer namorar comigo?</p>
+                    <div class="hstack hstack-fill">
+                        <button class="primary" onclick="goToNextStage()">SIM</button>
+                        <button class="secondary" id="btn-no" onclick="showError()">NÃO</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stage-2" class="quiz-stage enter-right hidden">
+                <div class="block">
+                    <p class="question">Qual dia começamos&#10;a namorar?</p>
+                    <input type="text" placeholder="DD/MM/AAAA" id="answer-2">
+                    <div class="hstack hstack-fill">
+                        <button class="primary" onclick="answerQuestion()">CONTINUAR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stage-3" class="quiz-stage enter-right hidden">
+                <div class="block">
+                    <p class="question">Escolha uma árvore:</p>
+                    <div class="hstack" style="margin: 0 auto 20px">
+                        <img src="./tree-1.png" class="image-option" onclick="goToNextStage()"/>
+                        <img src="./tree-2.png" class="image-option" onclick="showError()"/>
+                    </div>
+                    <div class="hstack" style="margin: 0 auto 20px">
+                        <img src="./tree-3.png" class="image-option" onclick="showError()"/>
+                        <img src="./tree-4.png" class="image-option" onclick="showError()"/>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stage-4" class="quiz-stage enter-right hidden">
+                <div class="block">
+                    <p class="question">Selecione as qualidades<br/>da minha namorada:</p>
+                    <div style="text-align: left;max-width: 100%; margin-bottom: 20px">
+                        <label><input type="checkbox" name="answer-4" value="0"> Dedicada</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="1"> Gentil</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="2"> Honesta</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="3"> Independente</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="4"> Temente a Deus</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="5"> Divertida</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="6"> Gostosa</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="7"> Trabalhadora</label><br/>
+                        <label><input type="checkbox" name="answer-4" value="8"> Muitas outras que não caberiam</label>
+                    </div>
+                    <div class="hstack hstack-fill">
+                        <button class="primary" onclick="answerQuestion()">
+                            CONTINUAR
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stage-5" class="quiz-stage enter-right hidden">
+                <div class="block">
+                    <p class="question">Complete a frase:<br/>"É só umas ____"</p>
+                    <input type="text" placeholder="Sem pressão" id="answer-5">
+                    <div class="hstack hstack-fill">
+                        <button class="primary" onclick="answerQuestion(true)">CONTINUAR</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="stage-final" class="quiz-stage enter-right hidden">
+                <div class="block">
+                    <img src="./love_1" style="max-width: 300px;margin: auto;margin-bottom: 20px;"/>
+                    <p class="question">Oi, amor da minha vida,</p>
+                    <p class="final-text">Sou muito grato por ter você ao meu lado. Sou apaixonado pelos seus olhos e sorriso, pela sua gentileza e dedicação, pelos seus dotes culinários <span style="text-decoration: line-through;color: #555555">e pela bunda também</span>. Estar contigo é sempre mais divertido, e quando faço qualquer coisa sem você parece que tem algo faltando. Algo muito importante.</p>
+                    <p class="final-text">Venho por meio desse programa expressar meu amor por você pelo fruto do meu trabalho também. Quero ser o homem da sua vida e da família que vamos construir juntos. Você é meu apoio e meu sustento sempre que eu preciso. Contigo a vida tem mais graça e mais sentido.</p>
+                    <img src="./love_3" style="max-width: 300px;margin: auto;margin-bottom: 20px;"/>
+                    <p class="final-text">Tenho certeza que vamos ser eternos namorados, bem cafonas mesmo e apaixonados um pelo outro. Um amor pautado no carinho, respeito, confiança, paz e Deus. Que Ele sempre te abençoe e continue também me abençoando com a sua companhia.</p>
+                    <p class="final-text">Estou aqui para o que precisar sempre, nos momentos bons e ruins. Conte comigo para o absolutamente o que precisar, mesmo que seja um dia que você só precise ser um pouco mimadinha (quase nem gosto de te mimar...).</p>
+                    <p class="final-text">Obrigado por todo esse tempo juntos, sabendo que daqui a 80 anos a gente vai achar que esses dois primeiros anos (e meio) eram só o começo de duas histórias que viraram uma só, e viveram felizes para sempre.</p>
+                    <p class="final-text">Te amo muito, do fundo do meu coração.</p>
+                    <p class="final-text">Att.</p>
+                    <p class="question">Vicente</p>
+                    <img src="./love_2" style="max-width: 300px;margin: auto;margin-bottom: 20px;"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+    <script>
+        var currentStage = 1;
+        const answers = [null, "16/12/2023", null, ["0", "1", "2", "3", "4", "5", "6", "7", "8"], "gota", null];
+
+        function getAnswerForCurrentStage() {
+            const checkboxes = document.querySelectorAll(
+                `input[type="checkbox"][name="answer-${currentStage}"]`
+            );
+
+            if (checkboxes.length > 0) {
+                return Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value)
+                    .sort();
+            }
+
+            const element = document.getElementById(`answer-${currentStage}`);
+            if (!element) return null;
+
+            switch (element.type) {
+                case "radio":
+                    const selected = document.querySelector(
+                        `input[name="answer-${currentStage}"]:checked`
+                    );
+                    return selected ? selected.value : null;
+
+                default:
+                    return element.value.trim();
+            }
+        }
+
+        function answersMatch(actual, expected) {
+            if (Array.isArray(expected)) {
+                return (
+                    Array.isArray(actual) &&
+                    actual.length === expected.length &&
+                    actual.every((v, i) => v === expected[i])
+                );
+            }
+
+            return actual === expected;
+        }
+
+        function answerQuestion(isLast) {
+            const answer = getAnswerForCurrentStage();
+            const expected = answers[currentStage - 1];
+            if (answersMatch(answer, expected)) isLast ? showFinal() : goToNextStage();
+            else showError();
+        }
+
+        function goToNextStage() {
+            const currentQuestion = document.getElementById(`stage-${currentStage}`);
+            const nextQuestion = document.getElementById(`stage-${currentStage + 1}`);
+
+            nextQuestion?.classList.remove('exit-left');
+            nextQuestion?.classList.add('enter-right');
+            currentQuestion?.classList.add('exit-left');
+
+            setTimeout(() => {
+                currentQuestion?.classList.add('hidden');
+                nextQuestion?.classList.remove('hidden');
+                setTimeout(() => {
+                    nextQuestion?.classList.remove('enter-right');
+                    currentStage += 1;
+                }, 20);
+            }, 400);
+        }
+
+        function showError() {
+            const currentQuestion = document.getElementById(`stage-${currentStage}`);
+            const errorDiv = document.getElementById(`stage-error`);
+
+            errorDiv?.classList.remove('exit-left');
+            errorDiv?.classList.add('enter-right');
+            currentQuestion?.classList.add('exit-left');
+
+            setTimeout(() => {
+                currentQuestion?.classList.add('hidden');
+                errorDiv?.classList.remove('hidden');
+                setTimeout(() => {
+                    errorDiv?.classList.remove('enter-right');
+                }, 20);
+            }, 400);
+        }
+        
+        function hideError() {
+            const currentQuestion = document.getElementById(`stage-${currentStage}`);
+            const errorDiv = document.getElementById(`stage-error`);
+
+            currentQuestion?.classList.remove('exit-left');
+            currentQuestion?.classList.add('enter-right');
+            errorDiv?.classList.add('exit-left');
+
+            setTimeout(() => {
+                errorDiv?.classList.add('hidden');
+                currentQuestion?.classList.remove('hidden');
+                setTimeout(() => {
+                    currentQuestion?.classList.remove('enter-right');
+                }, 20);
+            }, 400);
+        }
+
+        function showFinal() {
+            const currentQuestion = document.getElementById(`stage-${currentStage}`);
+            const finalDiv = document.getElementById(`stage-final`);
+            const h1 = document.getElementById(`h1`);
+            h1.innerHTML = "Feliz Dia dos<br/>Namorados!";
+
+            finalDiv?.classList.remove('exit-left');
+            finalDiv?.classList.add('enter-right');
+            currentQuestion?.classList.add('exit-left');
+
+            setTimeout(() => {
+                currentQuestion?.classList.add('hidden');
+                finalDiv?.classList.remove('hidden');
+                setTimeout(() => {
+                    finalDiv?.classList.remove('enter-right');
+                }, 20);
+            }, 400);
+        }
+    </script>
+</html>
